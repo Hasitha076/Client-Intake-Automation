@@ -606,15 +606,45 @@ export default function ClientIntakeForm() {
     }, 2200);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const year = new Date().getFullYear();
     const type = matterData.matterType.includes("Litig") ? "LIT" :
       matterData.matterType.includes("Corporate") ? "CORP" :
       matterData.matterType.includes("Real") ? "RE" :
       matterData.matterType.includes("IP") ? "IP" : "GEN";
     const num = String(Math.floor(Math.random() * 90000) + 10000);
-    setMatterNumber(`${type}-${year}-${num}`);
-    setSubmitted(true);
+    const generatedMatterNumber = `${type}-${year}-${num}`;
+    const webhookUrl = "https://n8n.srv1676388.hstgr.cloud/webhook-test/client-intake";
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          matterNumber: generatedMatterNumber,
+          clientData,
+          matterData,
+          conflictStatus,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook failed with status ${response.status}`);
+      }
+
+      setMatterNumber(generatedMatterNumber);
+      setSubmitted(true);
+      console.log("Form submitted successfully:", {
+        matterNumber: generatedMatterNumber,
+        client: clientData.clientName,
+        matterType: matterData.matterType,
+      });
+    } catch (error) {
+      console.error("Failed to submit intake webhook:", error);
+      alert("Submission failed. Please try again.");
+    }
   };
 
   if (submitted) {
