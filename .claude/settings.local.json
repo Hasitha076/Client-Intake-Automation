@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /root/.claude/uploads/7ca6d837-5f04-4ef2-aa0b-1740eef7854d/22a3c0e6-ClientIntakeForm.jsx /home/user/Client-Intake-Automation/src/ClientIntakeForm.jsx)"
+    ]
+  }
+}
