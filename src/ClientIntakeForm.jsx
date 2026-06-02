@@ -614,7 +614,7 @@ export default function ClientIntakeForm() {
       matterData.matterType.includes("IP") ? "IP" : "GEN";
     const num = String(Math.floor(Math.random() * 90000) + 10000);
     const generatedMatterNumber = `${type}-${year}-${num}`;
-    const webhookUrl = "https://n8n.srv1676388.hstgr.cloud/webhook-test/client-intake";
+    const webhookUrl = "https://n8n.srv1676388.hstgr.cloud/webhook/client-intake";
 
     try {
       const response = await fetch(webhookUrl, {
