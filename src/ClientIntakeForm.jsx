@@ -93,58 +93,17 @@ const selectStyle = { ...inputStyle, appearance: "none", backgroundImage: "url(\
 
 function StepIndicator({ current }) {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      marginBottom: 36,
-      gap: 0,
-    }}>
+    <div className="steps" style={{ display: "flex", alignItems: "center", marginBottom: 36, gap: 0 }}>
       {STEPS.map((step, i) => {
         const done = i < current;
         const active = i === current;
         return (
-          <div key={step.id} style={{ display: "flex", alignItems: "center", flex: 1 }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: "none" }}>
-              <div style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: done ? 14 : 13,
-                background: done ? "#2c2a25" : active ? "#8b7d6b" : "#f0ece6",
-                color: done || active ? "#fff" : "#b0a898",
-                fontFamily: "'DM Mono', monospace",
-                fontWeight: 500,
-                border: active ? "2px solid #2c2a25" : "none",
-                transition: "all 0.2s",
-                flexShrink: 0,
-              }}>
-                {done ? "✓" : i + 1}
-              </div>
-              <span style={{
-                marginTop: 4,
-                fontSize: 10,
-                fontFamily: "'DM Mono', monospace",
-                textTransform: "uppercase",
-                letterSpacing: "0.07em",
-                color: active ? "#2c2a25" : done ? "#8b7d6b" : "#c0b8ae",
-                whiteSpace: "nowrap",
-              }}>
-                {step.label}
-              </span>
+          <div key={step.id} className={`step ${done ? "done" : ""} ${active ? "active" : ""}`} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+            <div className="step-inner" style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: "none" }}>
+              <div className={`step-circle ${done ? "done" : ""} ${active ? "active" : ""}`}>{done ? "✓" : i + 1}</div>
+              <span className={`step-label ${active ? "active" : ""}`}>{step.label}</span>
             </div>
-            {i < STEPS.length - 1 && (
-              <div style={{
-                flex: 1,
-                height: 1,
-                background: done ? "#2c2a25" : "#ddd8d0",
-                margin: "0 8px",
-                marginBottom: 20,
-                transition: "background 0.3s",
-              }} />
-            )}
+            {i < STEPS.length - 1 && <div className={`step-bar ${done ? "done" : ""}`} />}
           </div>
         );
       })}
@@ -155,7 +114,7 @@ function StepIndicator({ current }) {
 function ClientStep({ data, onChange, errors }) {
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
+      <div className="two-col" style={{ gap: "0 20px" }}>
         <FieldGroup label="Client legal name" required error={errors.clientName}>
           <input
             style={{ ...inputStyle, borderColor: errors.clientName ? "#c0392b" : "#ddd8d0" }}
@@ -216,7 +175,7 @@ function ClientStep({ data, onChange, errors }) {
           placeholder="1 Canada Square, Canary Wharf, London E14 5AB"
         />
       </FieldGroup>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
+      <div className="two-col" style={{ gap: "0 20px" }}>
         <FieldGroup label="Company number / Tax ID">
           <input
             style={inputStyle}
@@ -241,7 +200,7 @@ function ClientStep({ data, onChange, errors }) {
 function MatterStep({ data, onChange, errors }) {
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
+      <div className="two-col" style={{ gap: "0 20px" }}>
         <FieldGroup label="Matter type" required error={errors.matterType}>
           <select
             style={{ ...selectStyle, borderColor: errors.matterType ? "#c0392b" : "#ddd8d0" }}
@@ -278,7 +237,7 @@ function MatterStep({ data, onChange, errors }) {
           placeholder="Brief summary of the matter, key issues, and immediate needs…"
         />
       </FieldGroup>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
+      <div className="two-col" style={{ gap: "0 20px" }}>
         <FieldGroup label="Opposing / adverse party">
           <input
             style={inputStyle}
@@ -313,9 +272,9 @@ function MatterStep({ data, onChange, errors }) {
         </FieldGroup>
       </div>
       <FieldGroup label="Billing arrangement">
-        <div style={{ display: "flex", gap: 12 }}>
+        <div className="billing-options" style={{ display: "flex", gap: 12 }}>
           {["Hourly rate", "Fixed fee", "Retainer", "Conditional"].map(opt => (
-            <label key={opt} style={{
+            <label key={opt} className="billing-option" style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
@@ -362,7 +321,7 @@ function ConflictStep({ data, status, onCheck, checking }) {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px", marginBottom: 16 }}>
+      <div className="two-col" style={{ gap: "0 20px", marginBottom: 16 }}>
         <div style={{
           background: "#fafaf8",
           border: "1px solid #e8e0d4",
@@ -477,7 +436,7 @@ function ReviewStep({ clientData, matterData, conflictStatus }) {
         paddingBottom: 6,
         borderBottom: "1px solid #e8e0d4",
       }}>{title}</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 20px" }}>
+      <div className="two-col" style={{ gap: "6px 20px" }}>
         {rows.map(([k, v]) => v ? (
           <div key={k}>
             <div style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: "#b0a898", marginBottom: 2 }}>{k}</div>
@@ -649,7 +608,7 @@ export default function ClientIntakeForm() {
 
   if (submitted) {
     return (
-      <div style={{
+      <div className="intake-root" style={{
         minHeight: "100vh",
         background: "linear-gradient(160deg, #f5f1eb 0%, #ede8e0 100%)",
         display: "flex",
@@ -657,7 +616,7 @@ export default function ClientIntakeForm() {
         justifyContent: "center",
         padding: 24,
       }}>
-        <div style={{
+        <div className="intake-card" style={{
           background: "#fff",
           border: "1px solid #ddd8d0",
           borderRadius: 12,
@@ -734,20 +693,66 @@ export default function ClientIntakeForm() {
   }
 
   return (
-    <div style={{
+    <div className="intake-root" style={{
       minHeight: "100vh",
       background: "linear-gradient(160deg, #f5f1eb 0%, #ede8e0 100%)",
       padding: "32px 20px",
       fontFamily: "'DM Sans', sans-serif",
-    }}>
+      }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
         input:focus, select:focus, textarea:focus { border-color: #8b7d6b !important; box-shadow: 0 0 0 3px rgba(139,125,107,0.12); }
         input[type="radio"] { cursor: pointer; }
+        /* Layout helpers */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; }
+        .three-col { display: grid; grid-template-columns: repeat(3, 1fr); }
+
+        /* Step indicator */
+        .steps { width: 100%; display: flex; align-items: center; justify-content: center; }
+        .step { display: flex; align-items: center; flex: 0 0 auto; }
+        .step-inner { display: flex; flex-direction: column; align-items: center; }
+        .step-circle {
+          width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+          font-family: 'DM Mono', monospace; font-weight: 500; font-size: 13px;
+          background: #f0ece6; color: #b0a898; transition: all 0.18s; flex-shrink: 0;
+        }
+        /* Hide other steps completely so only the current step is visible and centered */
+        .step:not(.active) { display: none !important; }
+        .steps { justify-content: center; }
+        .step-circle.done { background: #2c2a25; color: #fff; font-size: 14px; }
+        .step-circle.active { background: #8b7d6b; color: #fff; border: 2px solid #2c2a25; }
+        .step-label { margin-top: 6px; font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.07em; color: #c0b8ae; white-space: nowrap; }
+        .step-label.active { color: #2c2a25; }
+        .step-bar { flex: 1; height: 1px; background: #ddd8d0; margin: 0 8px; margin-bottom: 20px; transition: background .25s; }
+        .step-bar.done { background: #2c2a25; }
+
+        /* Billing options layout */
+        .billing-options { display: flex; gap: 12px; align-items: center; }
+        .billing-option { display: inline-flex; align-items: center; gap: 6px; }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+          .intake-root { padding: 18px 12px; }
+          .intake-container { padding: 0 6px; }
+          .intake-card { padding: 18px; }
+          .two-col { grid-template-columns: 1fr; gap: 12px 0 !important; }
+          .three-col { grid-template-columns: 1fr; gap: 12px 0 !important; }
+          .intake-card input, .intake-card select, .intake-card textarea { font-size: 16px; padding: 12px 14px; }
+          .intake-card button { font-size: 15px; padding: 12px 14px; }
+          /* Step indicator adjustments for small screens */
+          .step-circle { width: 26px; height: 26px; font-size: 12px; }
+          .step-circle.done { font-size: 13px; }
+          .step-label { font-size: 9px; margin-top: 4px; }
+          .step-bar { margin: 0 6px; margin-bottom: 16px; }
+          .steps { gap: 6px; }
+          /* Stack billing options vertically on small screens */
+          .billing-options { flex-direction: column; align-items: stretch; gap: 10px; }
+          .billing-option { width: 100%; }
+        }
       `}</style>
 
-      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+      <div className="intake-container" style={{ maxWidth: 680, margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{
@@ -773,7 +778,7 @@ export default function ClientIntakeForm() {
         </div>
 
         {/* Card */}
-        <div style={{
+        <div className="intake-card" style={{
           background: "#fff",
           border: "1px solid #ddd8d0",
           borderRadius: 12,
