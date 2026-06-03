@@ -3,7 +3,6 @@ import { useState, useRef } from "react";
 const STEPS = [
   { id: "client", label: "Client info", icon: "👤" },
   { id: "matter", label: "Matter details", icon: "📁" },
-  { id: "conflict", label: "Conflict check", icon: "🔍" },
   { id: "review", label: "Review & submit", icon: "✅" },
 ];
 
@@ -300,130 +299,9 @@ function MatterStep({ data, onChange, errors }) {
   );
 }
 
-function ConflictStep({ data, status, onCheck, checking }) {
-  return (
-    <div>
-      <div style={{
-        background: "#f5f1eb",
-        border: "1px solid #e8e0d4",
-        borderRadius: 8,
-        padding: "16px 20px",
-        marginBottom: 24,
-      }}>
-        <p style={{
-          margin: 0,
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 12,
-          color: "#6b5f52",
-          lineHeight: 1.7,
-        }}>
-          Checking against all existing clients, adverse parties, and related entities across the firm's matter database. This includes subsidiary name matching using pg_trgm fuzzy search.
-        </p>
-      </div>
 
-      <div className="two-col" style={{ gap: "0 20px", marginBottom: 16 }}>
-        <div style={{
-          background: "#fafaf8",
-          border: "1px solid #e8e0d4",
-          borderRadius: 6,
-          padding: "12px 16px",
-        }}>
-          <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: "#8b7d6b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Checking client</div>
-          <div style={{ fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#2c2a25", fontWeight: 500 }}>{data.clientName || "—"}</div>
-        </div>
-        <div style={{
-          background: "#fafaf8",
-          border: "1px solid #e8e0d4",
-          borderRadius: 6,
-          padding: "12px 16px",
-        }}>
-          <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: "#8b7d6b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Adverse party</div>
-          <div style={{ fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#2c2a25", fontWeight: 500 }}>{data.adverseParty || "None specified"}</div>
-        </div>
-      </div>
 
-      {status === "idle" && (
-        <button
-          onClick={onCheck}
-          style={{
-            width: "100%",
-            padding: "12px 24px",
-            background: "#2c2a25",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            fontFamily: "'DM Mono', monospace",
-            fontSize: 12,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            cursor: "pointer",
-            marginTop: 8,
-          }}>
-          Run conflict check
-        </button>
-      )}
-
-      {checking && (
-        <div style={{
-          textAlign: "center",
-          padding: "28px 0",
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 12,
-          color: "#8b7d6b",
-          letterSpacing: "0.08em",
-        }}>
-          <div style={{ fontSize: 24, marginBottom: 12, animation: "spin 1s linear infinite", display: "inline-block" }}>⟳</div>
-          <br />
-          Querying matter database…
-        </div>
-      )}
-
-      {status === "clear" && (
-        <div style={{
-          background: "#f0faf4",
-          border: "1px solid #a8d8b9",
-          borderRadius: 8,
-          padding: "16px 20px",
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 12,
-          marginTop: 8,
-        }}>
-          <span style={{ fontSize: 20, flexShrink: 0 }}>✓</span>
-          <div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 500, color: "#1a6b3c", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>No conflicts found</div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#2d7a4f" }}>
-              Checked 3,847 existing clients, 12,291 adverse parties, and 847 related entities. No matches found. You may proceed to matter creation.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {status === "conflict" && (
-        <div style={{
-          background: "#fff5f5",
-          border: "1px solid #f5a0a0",
-          borderRadius: 8,
-          padding: "16px 20px",
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 12,
-          marginTop: 8,
-        }}>
-          <span style={{ fontSize: 20, flexShrink: 0 }}>⚠</span>
-          <div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 500, color: "#a02020", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Potential conflict detected</div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#7a2020", lineHeight: 1.6 }}>
-              <strong>Acme Industries Ltd.</strong> appears as adverse party in matter LIT-2024-00831 (Meridian v. Acme Industries). Assigned partner: David Okafor. Please review before proceeding.
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ReviewStep({ clientData, matterData, conflictStatus }) {
+function ReviewStep({ clientData, matterData }) {
   const Section = ({ title, rows }) => (
     <div style={{ marginBottom: 20 }}>
       <div style={{
@@ -459,9 +337,9 @@ function ReviewStep({ clientData, matterData, conflictStatus }) {
         alignItems: "center",
         gap: 10,
       }}>
-        <span style={{ fontSize: 16 }}>{conflictStatus === "clear" ? "✓" : "⚠"}</span>
+        <span style={{ fontSize: 16 }}>⟳</span>
         <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#6b5f52", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          Conflict check: {conflictStatus === "clear" ? "Passed" : conflictStatus === "conflict" ? "Flagged — review required" : "Not run"}
+          Conflict check: handled in automation after submit
         </span>
       </div>
 
@@ -507,7 +385,6 @@ export default function ClientIntakeForm() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [matterNumber, setMatterNumber] = useState("");
-  const [conflictStatus, setConflictStatus] = useState("idle"); // idle | checking | clear | conflict
   const [errors, setErrors] = useState({});
 
   const [clientData, setClientData] = useState({
@@ -555,15 +432,7 @@ export default function ClientIntakeForm() {
     setStep(s => s + 1);
   };
 
-  const runConflictCheck = () => {
-    setConflictStatus("checking");
-    setTimeout(() => {
-      // Simulate: if adverse party contains 'Acme' → conflict
-      const hasConflict = matterData.adverseParty.toLowerCase().includes("acme") ||
-        clientData.clientName.toLowerCase().includes("rival");
-      setConflictStatus(hasConflict ? "conflict" : "clear");
-    }, 2200);
-  };
+
 
   const handleSubmit = async () => {
     const year = new Date().getFullYear();
@@ -585,7 +454,6 @@ export default function ClientIntakeForm() {
           matterNumber: generatedMatterNumber,
           clientData,
           matterData,
-          conflictStatus,
         }),
       });
 
@@ -655,10 +523,10 @@ export default function ClientIntakeForm() {
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 28 }}>
             {[
-              { label: "Client record", status: "Created" },
-              { label: "Conflict check", status: conflictStatus === "clear" ? "Passed" : "Flagged" },
-              { label: "Welcome email", status: "Sent" },
-            ].map(item => (
+                { label: "Client record", status: "Created" },
+                { label: "Conflict check", status: "Triggered" },
+                { label: "Welcome email", status: "Sent" },
+              ].map(item => (
               <div key={item.label} style={{
                 background: "#f5f1eb",
                 borderRadius: 6,
@@ -671,7 +539,7 @@ export default function ClientIntakeForm() {
             ))}
           </div>
           <button
-            onClick={() => { setSubmitted(false); setStep(0); setClientData({ clientName: "", entityType: "", contactName: "", contactTitle: "", contactEmail: "", contactPhone: "", address: "", companyNumber: "", industry: "" }); setMatterData({ matterType: "", jurisdiction: "", description: "", adverseParty: "", attorney: "", matterValue: "", openDate: "", billing: "Hourly rate" }); setConflictStatus("idle"); }}
+            onClick={() => { setSubmitted(false); setStep(0); setClientData({ clientName: "", entityType: "", contactName: "", contactTitle: "", contactEmail: "", contactPhone: "", address: "", companyNumber: "", industry: "" }); setMatterData({ matterType: "", jurisdiction: "", description: "", adverseParty: "", attorney: "", matterValue: "", openDate: "", billing: "Hourly rate" }); }}
             style={{
               padding: "10px 24px",
               background: "transparent",
@@ -802,15 +670,7 @@ export default function ClientIntakeForm() {
           {/* Step content */}
           {step === 0 && <ClientStep data={clientData} onChange={updateClient} errors={errors} />}
           {step === 1 && <MatterStep data={matterData} onChange={updateMatter} errors={errors} />}
-          {step === 2 && (
-            <ConflictStep
-              data={{ clientName: clientData.clientName, adverseParty: matterData.adverseParty }}
-              status={conflictStatus === "checking" ? "idle" : conflictStatus}
-              onCheck={runConflictCheck}
-              checking={conflictStatus === "checking"}
-            />
-          )}
-          {step === 3 && <ReviewStep clientData={clientData} matterData={matterData} conflictStatus={conflictStatus} />}
+          {step === 2 && <ReviewStep clientData={clientData} matterData={matterData} />}
 
           {/* Navigation */}
           <div style={{
@@ -844,10 +704,9 @@ export default function ClientIntakeForm() {
               {step + 1} / {STEPS.length}
             </div>
 
-            {step < 3 ? (
+            {step < STEPS.length - 1 ? (
               <button
                 onClick={handleNext}
-                disabled={step === 2 && conflictStatus !== "clear" && conflictStatus !== "conflict"}
                 style={{
                   padding: "10px 24px",
                   background: "#2c2a25",
@@ -858,8 +717,7 @@ export default function ClientIntakeForm() {
                   fontSize: 11,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  cursor: (step === 2 && conflictStatus !== "clear" && conflictStatus !== "conflict") ? "default" : "pointer",
-                  opacity: (step === 2 && conflictStatus !== "clear" && conflictStatus !== "conflict") ? 0.4 : 1,
+                  cursor: "pointer",
                 }}
               >
                 Continue →
@@ -869,7 +727,7 @@ export default function ClientIntakeForm() {
                 onClick={handleSubmit}
                 style={{
                   padding: "10px 24px",
-                  background: conflictStatus === "clear" ? "#1a6b3c" : "#8b7d6b",
+                  background: "#1a6b3c",
                   color: "#fff",
                   border: "none",
                   borderRadius: 6,
@@ -880,7 +738,7 @@ export default function ClientIntakeForm() {
                   cursor: "pointer",
                 }}
               >
-                {conflictStatus === "conflict" ? "⚠ Submit with flag" : "Open matter →"}
+                Open matter →
               </button>
             )}
           </div>
