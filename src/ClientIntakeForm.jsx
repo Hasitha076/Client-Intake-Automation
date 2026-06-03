@@ -384,6 +384,8 @@ function ReviewStep({ clientData, matterData }) {
 export default function ClientIntakeForm() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [matterNumber, setMatterNumber] = useState("");
   const [errors, setErrors] = useState({});
 
@@ -435,6 +437,8 @@ export default function ClientIntakeForm() {
 
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+
     const year = new Date().getFullYear();
     const type = matterData.matterType.includes("Litig") ? "LIT" :
       matterData.matterType.includes("Corporate") ? "CORP" :
@@ -445,6 +449,9 @@ export default function ClientIntakeForm() {
     const webhookUrl = "https://n8n.srv1676388.hstgr.cloud/webhook/client-intake";
 
     try {
+      setIsSubmitting(true);
+      setSubmitError("");
+
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
@@ -458,7 +465,17 @@ export default function ClientIntakeForm() {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook failed with status ${response.status}`);
+        let detail = "";
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+          const payload = await response.json().catch(() => null);
+          detail = payload?.message || payload?.error || "";
+        } else {
+          detail = await response.text().catch(() => "");
+        }
+
+        throw new Error(detail || `Webhook failed with status ${response.status}`);
       }
 
       setMatterNumber(generatedMatterNumber);
@@ -470,7 +487,15 @@ export default function ClientIntakeForm() {
       });
     } catch (error) {
       console.error("Failed to submit intake webhook:", error);
-      alert("Submission failed. Please try again.");
+
+      let message = error?.message || "";
+      if (!message || message === "Failed to fetch") {
+        message = "Could not reach the submission service. Check your internet connection, webhook URL, and CORS settings in n8n.";
+      }
+
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -539,7 +564,7 @@ export default function ClientIntakeForm() {
             ))}
           </div>
           <button
-            onClick={() => { setSubmitted(false); setStep(0); setClientData({ clientName: "", entityType: "", contactName: "", contactTitle: "", contactEmail: "", contactPhone: "", address: "", companyNumber: "", industry: "" }); setMatterData({ matterType: "", jurisdiction: "", description: "", adverseParty: "", attorney: "", matterValue: "", openDate: "", billing: "Hourly rate" }); }}
+            onClick={() => { setSubmitted(false); setStep(0); setSubmitError(""); setClientData({ clientName: "", entityType: "", contactName: "", contactTitle: "", contactEmail: "", contactPhone: "", address: "", companyNumber: "", industry: "" }); setMatterData({ matterType: "", jurisdiction: "", description: "", adverseParty: "", attorney: "", matterValue: "", openDate: "", billing: "Hourly rate" }); }}
             style={{
               padding: "10px 24px",
               background: "transparent",
@@ -725,6 +750,7 @@ export default function ClientIntakeForm() {
             ) : (
               <button
                 onClick={handleSubmit}
+                disabled={isSubmitting}
                 style={{
                   padding: "10px 24px",
                   background: "#1a6b3c",
@@ -735,13 +761,30 @@ export default function ClientIntakeForm() {
                   fontSize: 11,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  cursor: "pointer",
+                  cursor: isSubmitting ? "default" : "pointer",
+                  opacity: isSubmitting ? 0.7 : 1,
                 }}
               >
-                Open matter →
+                {isSubmitting ? "Submitting..." : "Open matter →"}
               </button>
             )}
           </div>
+
+          {!!submitError && (
+            <div style={{
+              marginTop: 14,
+              background: "#fff5f5",
+              border: "1px solid #f5a0a0",
+              borderRadius: 6,
+              padding: "10px 12px",
+              color: "#7a2020",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 13,
+              lineHeight: 1.5,
+            }}>
+              {submitError}
+            </div>
+          )}
         </div>
 
         <p style={{
